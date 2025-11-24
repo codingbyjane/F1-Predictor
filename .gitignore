@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# VSCode
+.vscode/
+
+# Virtual environments
+venv/
+env/
+*/.env
+
+# FastF1 cache
+data/cache/
+
+# Raw data
+data/*.csv
+data/*.json
+
+# OS stuff
+.DS_Store
