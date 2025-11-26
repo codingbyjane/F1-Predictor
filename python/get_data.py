@@ -39,6 +39,8 @@ rus_laps = laps.pick_drivers(['63']) # George Russel
 
 ant_laps = ant_laps.reset_index(drop=True)
 ver_laps = ver_laps.reset_index(drop=True)
+lec_laps = lec_laps.reset_index(drop=True)
+rus_laps = rus_laps.reset_index(drop=True)
 
 # retrieving the fastest lap for each driver
 fastest_ant = ant_laps.sort_values(by='LapTime').head(1)
@@ -71,7 +73,7 @@ laps_avg = laps.groupby(['Driver', 'Stint'])['LapTime'].mean()
 # print(ant_laps[['LapNumber', 'LapTime', 'Position']].tail(35))
 # print(ant_speed.head())
 
-# checking out plotting
+# checking out plotting for russel
 
 # getting telemetry for 50th lap
 rus_lap50_tel = rus_lap50.get_car_data().add_distance()
@@ -89,4 +91,31 @@ plt.xlabel("Distance (m)")
 plt.ylabel("Speed (km/h)")
 plt.grid = True
 
-plt.show()
+# plt.show()
+
+rus_lap_time = rus_laps['LapTime'].iloc[0] # access the time of the first lap
+rus_lap_seconds = rus_lap_time.total_seconds() 
+rus_lap_times_seconds = rus_laps['LapTime'].dt.total_seconds() # gets all lap times as seconds
+rus_positions = rus_laps['Position']
+
+
+# Experimenting with plotting - Leclerc vs Antonelli comparison
+
+# Convert timedelta to seconds for plotting
+lec_lap_time_scd = lec_laps['LapTime'].dt.total_seconds()
+ant_lap_time_scd = ant_laps['LapTime'].dt.total_seconds()
+
+fastf1.plotting.setup_mpl(color_scheme='fastf1')
+
+# Plot
+plt.figure(figsize=(12,6))
+plt.plot(lec_laps['LapNumber'], lec_lap_time_scd, marker='o', label='Leclerc')
+plt.plot(ant_laps['LapNumber'], ant_lap_time_scd, marker='x', label='Antonelli')
+
+plt.xlabel('Lap Number')
+plt.ylabel('Lap Time (seconds)')
+plt.title('Lap Time Comparison: Leclerc vs Antonelli')
+plt.grid = True
+plt.legend()
+
+#plt.show()
