@@ -54,6 +54,9 @@ fastest_per_driver = laps.groupby('Driver')['LapTime'].min()
 # the fastest general lap in the session
 session_best = laps.pick_fastest()
 
+lec_fastest = lec_laps.pick_fastest() # extract info about the fastest lap
+ant_fastest = ant_laps.pick_fastest()
+
 ant_lap48 = ant_laps[ant_laps['LapNumber'] == 48].iloc[0]
 lec_lap43 = lec_laps[lec_laps['LapNumber'] == 43].iloc[0]
 ver_lap50 = ver_laps[ver_laps['LapNumber'] == 50].iloc[0]
@@ -67,14 +70,21 @@ ant_speed = ant_lap48_tel['Speed']
 # retrieve all laps on soft tyres
 soft_laps = laps[laps['Compound'] == 'SOFT']
 
+ver_hard = ver_laps[ver_laps['Compound'] == 'HARD'] # retrieve all laps on hard tyres for Verstappen
+ver_medium = ver_laps[ver_laps['Compound'] == 'MEDIUM'] # retrieve all laps on medium tyres for Verstappen
+
 # retrieve average lap time per stint
 laps_avg = laps.groupby(['Driver', 'Stint'])['LapTime'].mean()
+
+# retrieving sector times
+lec_sectors = lec_laps[['LapNumber', 'Sector1Time', 'Sector2Time', 'Sector3Time']].head()
+rus_sectors = rus_laps[['LapNumber', 'Sector1Time', 'Sector2Time', 'Sector2Time']].head()
 
 # print(ant_laps[['LapNumber', 'LapTime', 'Position']].tail(35))
 # print(ant_speed.head())
 
-# checking out plotting for russel
 
+# checking out plotting for russel
 # getting telemetry for 50th lap
 rus_lap50_tel = rus_lap50.get_car_data().add_distance()
 
@@ -96,7 +106,7 @@ plt.grid = True
 rus_lap_time = rus_laps['LapTime'].iloc[0] # access the time of the first lap
 rus_lap_seconds = rus_lap_time.total_seconds() 
 rus_lap_times_seconds = rus_laps['LapTime'].dt.total_seconds() # gets all lap times as seconds
-rus_positions = rus_laps['Position']
+rus_positions = rus_laps['Position'] # retrieve positions for Russel's laps
 
 
 # Experimenting with plotting - Leclerc vs Antonelli comparison
