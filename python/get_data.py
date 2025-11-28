@@ -54,6 +54,13 @@ fastest_per_driver = laps.groupby('Driver')['LapTime'].min()
 # the fastest general lap in the session
 session_best = laps.pick_fastest()
 
+ver_best_lap = ver_laps[ver_laps['LapTime'] == ver_laps['LapTime'].min()]
+ver_valid = ver_laps[ver_laps['Deleted'] == False] # find all valid laps
+ver_deleted = ver_laps[ver_laps['Deleted'] == True] # find all deleted laps
+
+# print(fastest_ver, ver_best_lap) the output is absolutely identical
+print(ver_valid, ver_deleted)
+
 lec_fastest = lec_laps.pick_fastest() # extract info about the fastest lap
 ant_fastest = ant_laps.pick_fastest()
 
