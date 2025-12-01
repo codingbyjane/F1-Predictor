@@ -5,28 +5,6 @@ import matplotlib.pyplot as plt
 # Enable caching (saves downloaded data to disk for future use)
 fastf1.Cache.enable_cache('../data/cache')
 
-"""session = fastf1.get_session(2025, "Brazil", "Race")
-session.load()
-
-#print(session.drivers)
-
-laps = session.laps #session.laps loads all laps of all drivers and saves it in the laps variable as a Pandas Dataframe
-
-lec_laps = laps.pick_drivers(['16']) # Charles Leclerc
-ant_laps = laps.pick_drivers(['12']) # Kimi Antonelli
-ver_laps = laps.pick_drivers(['1']) # Max Verstappen
-
-ant_laps = ant_laps.reset_index(drop=True)
-ver_laps = ver_laps.reset_index(drop=True)
-
-lec_lap5 = lec_laps[lec_laps['LapNumber'] == 5]
-lec_lap5_time = lec_lap5['LapTime'].iloc[0]
-
-#print(lec_laps.head())  first 5 laps of Leclerc
-#print(ver_laps[['LapNumber', 'LapTime', 'Position']].tail(25)) 
-
-"""
-
 session = fastf1.get_session(2025, 'Las Vegas', 'Race')
 session.load()
 
@@ -55,30 +33,23 @@ fastest_per_driver = laps.groupby('Driver')['LapTime'].min()
 session_best = laps.pick_fastest()
 
 ver_best_lap = ver_laps[ver_laps['LapTime'] == ver_laps['LapTime'].min()]
+
+# print(fastest_ver, ver_best_lap) the output is absolutely identical
+
 ver_valid = ver_laps[ver_laps['Deleted'] == False] # find all valid laps
 ver_deleted = ver_laps[ver_laps['Deleted'] == True] # find all deleted laps
 
-# print(fastest_ver, ver_best_lap) the output is absolutely identical
-print(ver_valid, ver_deleted)
+ant_s1_fastest = ant_laps[ant_laps['Sector1Time'] == ant_laps['Sector1Time'].min()] # fastest lap in sector 1
+ant_s2_fastest = ant_laps[ant_laps['Sector2Time'] == ant_laps['Sector2Time'].min()] # fastest lap in sector 2
+ant_s3_fastest = ant_laps[ant_laps['Sector3Time'] == ant_laps['Sector3Time'].min()] # fastest lap in sector 3
 
-lec_fastest = lec_laps.pick_fastest() # extract info about the fastest lap
-ant_fastest = ant_laps.pick_fastest()
+lec_fastest = lec_laps.pick_fastest() # extract info about the fastest Leclerc lap
+ant_fastest = ant_laps.pick_fastest() # extract info about the fastest Antonelli lap
 
 ant_lap48 = ant_laps[ant_laps['LapNumber'] == 48].iloc[0]
 lec_lap43 = lec_laps[lec_laps['LapNumber'] == 43].iloc[0]
 ver_lap50 = ver_laps[ver_laps['LapNumber'] == 50].iloc[0]
 rus_lap50 = rus_laps[rus_laps['LapNumber'] == 50].iloc[0]
-
-# getting telemetry for that lap
-ant_lap48_tel = ant_lap48.get_telemetry()
-
-ant_speed = ant_lap48_tel['Speed']
-
-# retrieve all laps on soft tyres
-soft_laps = laps[laps['Compound'] == 'SOFT']
-
-ver_hard = ver_laps[ver_laps['Compound'] == 'HARD'] # retrieve all laps on hard tyres for Verstappen
-ver_medium = ver_laps[ver_laps['Compound'] == 'MEDIUM'] # retrieve all laps on medium tyres for Verstappen
 
 # retrieve average lap time per stint
 laps_avg = laps.groupby(['Driver', 'Stint'])['LapTime'].mean()
@@ -87,9 +58,25 @@ laps_avg = laps.groupby(['Driver', 'Stint'])['LapTime'].mean()
 lec_sectors = lec_laps[['LapNumber', 'Sector1Time', 'Sector2Time', 'Sector3Time']].head()
 rus_sectors = rus_laps[['LapNumber', 'Sector1Time', 'Sector2Time', 'Sector2Time']].head()
 
-# print(ant_laps[['LapNumber', 'LapTime', 'Position']].tail(35))
-# print(ant_speed.head())
+# playing around with telemetry now
 
+# getting telemetry for fastest Antonelli lap
+ant_lap48_tel = ant_lap48.get_telemetry()
+ant_speed = ant_lap48_tel['Speed']
+
+list(ant_lap48_tel.columns) # outputs: ['Date', 'SessionTime', 'DriverAhead', 'DistanceToDriverAhead', 'Time', 'RPM', 'Speed', 'nGear', 'Throttle', 'Brake', 'DRS', 'Source', 'Distance', 'RelativeDistance', 'Status', 'X', 'Y', 'Z']
+
+# retrieve all laps on soft tyres
+soft_laps = laps[laps['Compound'] == 'SOFT']
+
+ver_hard = ver_laps[ver_laps['Compound'] == 'HARD'] # retrieve all laps on hard tyres for Verstappen
+ver_medium = ver_laps[ver_laps['Compound'] == 'MEDIUM'] # retrieve all laps on medium tyres for Verstappen
+
+# print(ant_laps[['LapNumber', 'LapTime', 'Position']].tail(35))
+
+# smoothing GPS coordinates
+ant_lap48_tel['X_smooth'] = ant_lap48_tel['X'].rolling(window=5, min_periods=1).mean()
+ant_lap48_tel['Y_smooth'] = ant_lap48_tel['Y'].rolling(window=5, min_periods=1).mean()
 
 # checking out plotting for russel
 # getting telemetry for 50th lap
