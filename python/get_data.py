@@ -75,8 +75,11 @@ ver_medium = ver_laps[ver_laps['Compound'] == 'MEDIUM'] # retrieve all laps on m
 # print(ant_laps[['LapNumber', 'LapTime', 'Position']].tail(35))
 
 # smoothing GPS coordinates
+
 ant_lap48_tel['X_smooth'] = ant_lap48_tel['X'].rolling(window=5, min_periods=1).mean()
 ant_lap48_tel['Y_smooth'] = ant_lap48_tel['Y'].rolling(window=5, min_periods=1).mean()
+
+print(ant_lap48_tel[['X', 'X_smooth', 'Y_smooth']].head(10))
 
 # checking out plotting for russel
 # getting telemetry for 50th lap
