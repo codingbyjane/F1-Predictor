@@ -2,6 +2,7 @@
 __pycache__/
 *.pyc
 *.pyo
+*.pyd
 
 # VSCode
 .vscode/
@@ -19,6 +20,13 @@ data/cache/
 # Raw data
 data/*.csv
 data/*.json
+data/raw/
+
+# Processed ML data
+data/processed/
+
+# Models
+models/
 
 # OS stuff
 .DS_Store
