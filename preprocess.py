@@ -67,3 +67,13 @@ def season_results(year):
 
             chunks.append(results_df) # append the paginated results dataframe to the chunks list
             recieved += len(results_df) # increment the received counter by the number of rows in the results dataframe
+
+        if recieved >= results_page.total_results: # Break the loop if the number of recieved results is greater than or equal to the total number of results available in the API response
+            break
+        try:
+            time.sleep(0.5) # pause running the program for 0.5 seconds to avoid reaching the API rate limit
+            results_page = retry(results_page.get_next_result_page)
+        except ValueError as exception:
+            if "No next page" in str(exception):
+                break
+            raise
