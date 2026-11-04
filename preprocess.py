@@ -33,13 +33,16 @@ api = Ergast(limit=100) # Create an instance of the Ergast API and set paginatio
 # Define a retry helper
 def retry(function):
     for attempt in range(4): # makes 4 attempts to run the passed function
+        
+        # Exception handling
         try:
             return function() # returns the result of the supplied function if there are no errors
-        except Exception:
+        
+        except Exception: # Use Exception to catch a wide range of possible APIruntime errors  
             if attempt == 3:
                 raise # raise the error message after the fourth attempt
 
-            time.sleep(2 ** (attempt + 1)) # waits for 2, 4, and 8 seconds between consecutive attempts
+            time.sleep(2 ** (attempt + 1)) # pausing the program (exponential backof) for 2, 4, and 8 seconds between consecutive attempts
 
 # Get season results
 def season_results(year):
@@ -48,7 +51,17 @@ def season_results(year):
     if path.exists():
         return pd.read_csv(path, parse_dates=['raceDate'])
 
-    page = retry(lambda: api.get_race_results(season=year))
+    page = retry(lambda: api.get_race_results(season=year)) # 
 
     chunks = []
     recieved = 0
+
+    while True:
+        for (_, meta), result in zip(page.description.iterrows(), page.content):
+            results_df = pd.DataFrame(result).copy() # save the race results into a dataframe and make a copy of it to avoid overwriting the original data
+
+            for col_name in ['season', 'round', 'raceName', 'raceDate', 'circuitId']:
+                results_df[col_name] = meta[col_name] # add the metadata columns to the results dataframe
+
+            chunks.append(results_df) # append the paginated results dataframe to the chunks list
+            recieved += len(results_df) # increment the received counter by the number of rows in the results dataframe
