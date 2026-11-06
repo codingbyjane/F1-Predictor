@@ -39,11 +39,11 @@ def retry(function):
         try:
             return function() # returns the result of the supplied function if there are no errors
         
-        except Exception: # Use Exception to catch a wide range of possible APIruntime errors  
+        except Exception: # use Exception to catch a wide range of possible API runtime errors  
             if attempt == 3:
                 raise # raise the error message after the fourth attempt
 
-            time.sleep(2 ** (attempt + 1)) # pausing the program (exponential backof) for 2, 4, and 8 seconds between consecutive attempts
+            time.sleep(2 ** (attempt + 1)) # pausing the program (exponential backoff) for 2, 4, and 8 seconds between consecutive attempts
 
 
 # Define a funciton to retrieve season results from the Ergast API and cache them as a CSV file (takes a year argument for the season)
@@ -51,7 +51,7 @@ def season_results(year):
     path = cache / f"results_{year}_{datetime.now(timezone.utc):%Y%m%d}.csv" # Create a path to the CSV cache folder with the filename formatted to include the current date and time in UTC (limit the name to year/month/day)
 
     if path.exists():
-        return pd.read_csv(path, parse_dates=['raceDate'])
+        return pd.read_csv(path, parse_dates=['raceDate']) # Read the existing CSV file and return it as a pandas DataFrame, parsing the column 'raceDate' as a datetime object rather than plain text
 
     results_page = retry(lambda: api.get_race_results(season=year)) # calling the Ergast API wiht the retry helper and saving the results object into a variable
 
@@ -59,7 +59,7 @@ def season_results(year):
     recieved = 0
 
     while True:
-        for (_, meta), result in zip(results_page.description.iterrows(), results_page.content):
+        for (_, meta), result in zip(results_page.description.iterrows(), results_page.content): # accessing the description and content attributes (the race-level data and the race results data)
             results_df = pd.DataFrame(result).copy() # save the race results into a dataframe and make a copy of it to avoid overwriting the original data
 
             for col_name in ['season', 'round', 'raceName', 'raceDate', 'circuitId']:
@@ -70,6 +70,7 @@ def season_results(year):
 
         if recieved >= results_page.total_results: # Break the loop if the number of recieved results is greater than or equal to the total number of results available in the API response
             break
+
         try:
             time.sleep(0.5) # pause running the program for 0.5 seconds to avoid reaching the API rate limit
             results_page = retry(results_page.get_next_result_page)
@@ -77,3 +78,11 @@ def season_results(year):
             if "No next page" in str(exception):
                 break
             raise
+
+        if not chunks:
+            return pd.DataFrame() # return an empty dataframe if no results for the specified season were found
+
+        results_df = pd.concat(chunks, ignore_index=True).drop_duplicates(subset=['season', 'round', 'driverId'])
+        results_df.to_csv(path, index=False)
+
+        return results_df
