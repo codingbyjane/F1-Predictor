@@ -89,3 +89,4 @@ def season_results(year):
 
 # Retrieving the race schedule
 schedule = retry(lambda: api.get_race_schedule(season=target_year))
+austin = schedule.loc[schedule['cirquitId'].eq('americas')].copy()
