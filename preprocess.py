@@ -55,20 +55,31 @@ def season_results(year):
 
     results_page = retry(lambda: api.get_race_results(season=year)) # calling the Ergast API with the retry helper and saving the results object into a variable
 
+    
+    print(type(results_page)) # checking the type of the response object returned by the ergast API (should be a fastf1.ergast.RaceResultsPage object)
+    print(type(results_page.description)) # Type of the metadata attribute of the results_page object
+    print(type(results_page.content)) # Type of the race-level results data attribute
+
+    print(results_page.description.head())
+    print(len(results_page.content))
+
+    print(type(results_page.content[0]))
+    print(results_page.content[0].head())
+
     chunks = []
-    recieved = 0
+    received = 0
 
     while True:
         for (_, meta), result in zip(results_page.description.iterrows(), results_page.content): # accessing the description (metadata) and content attributes (the race-level data and the race results data)
             results_df = pd.DataFrame(result).copy() # save the race results into a dataframe and make a copy of it to avoid overwriting the original data
 
             for col_name in ['season', 'round', 'raceName', 'raceDate', 'circuitId']: # iterate over each of the metadata columns
-                results_df[col_name] = meta[col_name] # add the metadata columns to the results dataframe
+                results_df[col_name] = meta[col_name] # add the metadata columns to the results dataframe (breadcasting the metadata values to all rows in the results dataframe)
 
             chunks.append(results_df) # append the paginated results dataframe to the chunks list
-            recieved += len(results_df) # increment the received counter by the number of rows in the results dataframe
+            received += len(results_df) # increment the received counter by the number of rows in the results dataframe
 
-        if recieved >= results_page.total_results: # Break the loop if the number of recieved results is greater than or equal to the total number of results available in the API response
+        if received >= results_page.total_results: # Break the loop if the number of recieved results is greater than or equal to the total number of results available in the API response
             break
 
         try:
