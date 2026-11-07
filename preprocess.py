@@ -53,7 +53,7 @@ def season_results(year):
     if path.exists():
         return pd.read_csv(path, parse_dates=['raceDate']) # Read the existing CSV file and return it as a pandas DataFrame, parsing the column 'raceDate' as a datetime object rather than plain text (e.g., 2023-03-05)
 
-    results_page = retry(lambda: api.get_race_results(season=year)) # calling the Ergast API wiht the retry helper and saving the results object into a variable
+    results_page = retry(lambda: api.get_race_results(season=year)) # calling the Ergast API with the retry helper and saving the results object into a variable
 
     chunks = []
     recieved = 0
@@ -90,3 +90,6 @@ def season_results(year):
 # Retrieving the race schedule
 schedule = retry(lambda: api.get_race_schedule(season=target_year))
 austin = schedule.loc[schedule['cirquitId'].eq('americas')].copy()
+
+if len(austin) != 1:
+    raise ValueError(f"No race found for the Americas circuit for the {target_year} season. Check the race schedule and target_year")
