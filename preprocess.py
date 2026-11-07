@@ -63,8 +63,12 @@ def season_results(year):
     print(f"Metadata inspection: {results_page.description.head()}")
     print(f"Length of results_page.content: {len(results_page.content)}")
 
-    print(f"Type of the first race-level result: {type(results_page.content[0])}") 
-    print(f"First race-level result inspection: {results_page.content[0].head()}")
+    print(f"Type of the first race-level result: {type(results_page.content.iloc[0])}") 
+    print(f"First race-level result inspection: {results_page.content.iloc[0].head()}")
+
+    # Inspect the columns in both returned attributes
+    print(f"Columns in the metadata attribute: {results_page.description.columns}")
+    print(f"Columns in the first result of the race-level data attribute: {results_page.content.iloc[0].columns}")
 
     chunks = []
     received = 0
