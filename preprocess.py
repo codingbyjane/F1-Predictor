@@ -57,14 +57,14 @@ def season_results(year):
 
     
     print(type(results_page)) # checking the type of the response object returned by the ergast API (should be a fastf1.ergast.RaceResultsPage object)
-    print(type(results_page.description)) # Type of the metadata attribute of the results_page object
-    print(type(results_page.content)) # Type of the race-level results data attribute
+    print(f"Type of results_page.description: {type(results_page.description)}") # Type of the metadata attribute of the results_page object
+    print(f"Type of results_page.content: {type(results_page.content)}") # Type of the race-level results data attribute
 
-    print(results_page.description.head())
-    print(len(results_page.content))
+    print(f"Metadata inspection: {results_page.description.head()}")
+    print(f"Length of results_page.content: {len(results_page.content)}")
 
-    print(type(results_page.content[0]))
-    print(results_page.content[0].head())
+    print(f"Type of the first race-level result: {type(results_page.content[0])}") 
+    print(f"First race-level result inspection: {results_page.content[0].head()}")
 
     chunks = []
     received = 0
