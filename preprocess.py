@@ -86,7 +86,7 @@ def season_results(year):
             chunks.append(results_df) # append the paginated results dataframe to the chunks list
             received += len(results_df) # increment the received counter by the number of rows in the results dataframe
 
-        if received >= results_page.total_results: # Break the loop if the number of recieved results is greater than or equal to the total number of results available in the API response
+        if received >= results_page.total_results: # Break the loop if the number of recieved results is greater than or equal to the total number of results available in the API response (how many results match the season query overall—not just how many are on that page)
             break
 
         # Get the next results page and handle the case where there are no more results available
@@ -98,13 +98,13 @@ def season_results(year):
                 break
             raise
 
-        if not chunks:
-            return pd.DataFrame() # return an empty dataframe if no results for the specified season were found
+    if not chunks: # if the chunks list is empty (not chunks = False)
+        return pd.DataFrame() # return an empty dataframe if no results for the specified season were found
 
-        results_df = pd.concat(chunks, ignore_index=True).drop_duplicates(subset=['season', 'round', 'driverId'])
-        results_df.to_csv(path, index=False)
+    results_df = pd.concat(chunks, ignore_index=True).drop_duplicates(subset=['season', 'round', 'driverId']) # concat() stacks the dataframes vertically, ignore original indeces
+    results_df.to_csv(path, index=False)
 
-        return results_df
+    return results_df
 
 # Retrieving the race schedule
 schedule = retry(lambda: api.get_race_schedule(season=target_year))
