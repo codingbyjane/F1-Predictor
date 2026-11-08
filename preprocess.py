@@ -70,15 +70,18 @@ def season_results(year):
     print(f"Columns in the metadata attribute: {results_page.description.columns}")
     print(f"Columns in the first result of the race-level data attribute: {results_page.content.iloc[0].columns}")
 
+    # Check the total number of results available in the API response
+    print(f"Total number of results available in one API response: {results_page.total_results}")
+
     chunks = []
     received = 0
 
     while True:
-        for (_, meta), result in zip(results_page.description.iterrows(), results_page.content): # accessing the description (metadata) and content attributes (the race-level data and the race results data)
+        for (_, meta), result in zip(results_page.description.iterrows(), results_page.content): # accessing the description (metadata) and content attributes (the race-level data and the race results data). This zips the inner metadata tuple (index, pd.series) with the results dataframe
             results_df = pd.DataFrame(result).copy() # save the race results into a dataframe and make a copy of it to avoid overwriting the original data
 
             for col_name in ['season', 'round', 'raceName', 'raceDate', 'circuitId']: # iterate over each of the metadata columns
-                results_df[col_name] = meta[col_name] # add the metadata columns to the results dataframe (breadcasting the metadata values to all rows in the results dataframe)
+                results_df[col_name] = meta[col_name] # add the metadata columns to the results dataframe (broadcasting the scalar metadata values to all rows in the results dataframe)
 
             chunks.append(results_df) # append the paginated results dataframe to the chunks list
             received += len(results_df) # increment the received counter by the number of rows in the results dataframe
@@ -86,6 +89,7 @@ def season_results(year):
         if received >= results_page.total_results: # Break the loop if the number of recieved results is greater than or equal to the total number of results available in the API response
             break
 
+        # Get the next results page and handle the case where there are no more results available
         try:
             time.sleep(0.5) # pause running the program for 0.5 seconds to avoid reaching the API rate limit
             results_page = retry(results_page.get_next_result_page)
