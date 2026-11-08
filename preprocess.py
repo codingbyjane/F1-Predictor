@@ -115,3 +115,13 @@ if len(austin) != 1:
     raise ValueError(f"No race found for the Americas circuit for the {target_year} season. Check the race schedule and target_year")
 
 target_race = austin.iloc[0]
+target_date = pd.Timestamp(target_race['raceDate'].tz_localize(None)).normalize() # Convert the race date to a timezone-naive timestamp and normalize it to midnight
+
+frames = []
+
+for year in range(start_year, target_year + 1): # Iterate through the years from the start year to the target year (+1 means inclusive of the target year)
+    partial_results = season_results(year)
+
+    if not partial_results.empty:
+        frames.append(partial_results)
+    print(f"{year}: {len(partial_results)} driver results loaded")
