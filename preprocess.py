@@ -106,15 +106,19 @@ def season_results(year):
 
     return results_df
 
-# Retrieving the race schedule
+
+# Retrieving the race schedule for the target year
 schedule = retry(lambda: api.get_race_schedule(season=target_year))
-austin = schedule.loc[schedule['cirquitId'].eq('americas')].copy()
+print(f"\nType of the returned schedule attribute: {type(schedule)}")
+
+# Filtrering the schedule for the Americas circuit (Austin GP)
+austin = schedule.loc[schedule['circuitId'].eq('americas')].copy() # Equivalent to schedule[schedule['cirquitId'] == 'americas']. The .loc method is label-based indexing
 
 # Raise a value error if no results were found for the Americas circuit in the target season
 if len(austin) != 1:
     raise ValueError(f"No race found for the Americas circuit for the {target_year} season. Check the race schedule and target_year")
 
-target_race = austin.iloc[0]
+target_race = austin.iloc[0] # Get the first row of the matched dataframe (there should only be one row for the Americas circuit in the target season) (the .iloc method is position-based indexing)
 target_date = pd.Timestamp(target_race['raceDate'].tz_localize(None)).normalize() # Convert the race date to a timezone-naive timestamp and normalize it to midnight
 
 frames = []
