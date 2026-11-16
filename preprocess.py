@@ -63,12 +63,12 @@ def season_results(year):
     print(f"Metadata inspection: {results_page.description.head()}")
     print(f"Length of results_page.content: {len(results_page.content)}")
 
-    print(f"Type of the first race-level result: {type(results_page.content.iloc[0])}") 
-    print(f"First race-level result inspection: {results_page.content.iloc[0].head()}")
+    print(f"Type of the first race-level result: {type(results_page.content[0])}")
+    print(f"First race-level result inspection: {results_page.content[0].head()}")
 
     # Inspect the columns in both returned attributes
     print(f"Columns in the metadata attribute: {results_page.description.columns}")
-    print(f"Columns in the first result of the race-level data attribute: {results_page.content.iloc[0].columns}")
+    print(f"Columns in the first result of the race-level data attribute: {results_page.content[0].columns}")
 
     # Check the total number of results available in the API response
     print(f"Total number of results available in one API response: {results_page.total_results}")
@@ -137,9 +137,11 @@ for year in range(start_year, target_year + 1): # Iterate through the years from
         season_results_frames.append(partial_results)
     print(f"{year}: {len(partial_results)} driver results loaded")
 
-raw = pd.concat(season_results_frames, ignore_index=True) # concatenate all the seasonal results dataframes stored in the list into a single large dataframe of raw results, ignore the original pandas indeces 
-raw['raceDate'] = pd.to_datetime(raw['raceDate'].dt.tz_localize(None))
+raw_szn_resluts_df = pd.concat(season_results_frames, ignore_index=True) # concatenate all the seasonal results dataframes stored in the list into a single large dataframe of raw results, ignore the original pandas indeces 
+raw_szn_resluts_df['raceDate'] = pd.to_datetime(raw_szn_resluts_df['raceDate'].dt.tz_localize(None))
 
 today = pd.Timestamp(datetime.now(timezone.utc)).date()
 
-history = raw.loc[(raw['raceDate'] < target_date) & (raw['raceDate'] < today)].copy()
+# history_df = raw_szn_resluts_df.loc[(raw_szn_resluts_df['raceDate'] < target_date) & (raw_szn_resluts_df['raceDate'] < today)].copy()
+
+history_df = raw_szn_resluts_df.loc[(raw_szn_resluts_df['raceDate'] < target_date)].copy() # filter the raw seasonal results dataframe to include only historical data preceding the target race date and store its copy in a corresponding variable
