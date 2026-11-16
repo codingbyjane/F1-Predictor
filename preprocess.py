@@ -54,7 +54,6 @@ def season_results(year):
         return pd.read_csv(path, parse_dates=['raceDate']) # Read the existing CSV file and return it as a pandas DataFrame, parsing the column 'raceDate' as a datetime object rather than plain text (e.g., 2023-03-05)
 
     results_page = retry(lambda: api.get_race_results(season=year)) # calling the Ergast API with the retry helper and saving the results object into a variable
-
     
     print(type(results_page)) # checking the type of the response object returned by the ergast API (should be a fastf1.ergast.RaceResultsPage object)
     print(f"Type of results_page.description: {type(results_page.description)}") # Type of the metadata attribute of the results_page object
@@ -123,7 +122,7 @@ target_race = austin.iloc[0] # Get the first row of the matched dataframe (there
 # Target race date inspection
 print(f"Target race date: {target_race['raceDate']}")
 print(f"Type of the target race date: {type(target_race['raceDate'])}")
-print(f"Inspect of the target race date value is a Pandas Timestamp object: {target_race['raceDate'].tz}")
+print(f"Inspect of the target race date value is a Pandas Timestamp object: {target_race['raceDate'].tz}\n")
 
 target_date = pd.Timestamp(target_race['raceDate'].tz_localize(None)).normalize() # assign the target date to a corresponding variable and the race date to a timezone-naive timestamp and normalize it to midnight
 
@@ -142,6 +141,6 @@ raw_szn_resluts_df['raceDate'] = pd.to_datetime(raw_szn_resluts_df['raceDate'].d
 
 today = pd.Timestamp(datetime.now(timezone.utc)).date()
 
-# history_df = raw_szn_resluts_df.loc[(raw_szn_resluts_df['raceDate'] < target_date) & (raw_szn_resluts_df['raceDate'] < today)].copy()
+'''history_df = raw_szn_resluts_df.loc[(raw_szn_resluts_df['raceDate'] < target_date) & (raw_szn_resluts_df['raceDate'] < today)].copy()'''
 
 history_df = raw_szn_resluts_df.loc[(raw_szn_resluts_df['raceDate'] < target_date)].copy() # filter the raw seasonal results dataframe to include only historical data preceding the target race date and store its copy in a corresponding variable
