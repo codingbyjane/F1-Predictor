@@ -86,7 +86,7 @@ def season_results(year):
             chunks.append(results_df) # append the paginated race-level results dataframes to the chunks list
             received += len(results_df) # increment the counter by the number of rows in the results dataframe
 
-        if received >= results_page.total_results: # Break the loop if the number of recieved results is greater than or equal to the total number of results available in the API response (how many results match the season query overall—not just how many are on that page). 'total_results' is a property of the RaceResultsPage object that returns the total number of results available for the specified season
+        if received >= results_page.total_results: # Break the loop if the number of recieved results is greater than or equal to the total number of results available in the API response (how many results match the season query overall, not just how many are on that page). 'total_results' is a property of the ErgastResponseMixin class that returns the total number of results available for the specified season
             break
 
         # Get the next results page and handle the case where there are no more results available
@@ -114,9 +114,9 @@ print(f"\nType of the returned schedule attribute: {type(schedule)}")
 # Filtrering the schedule for the Americas circuit (Austin GP)
 austin = schedule.loc[schedule['circuitId'].eq('americas')].copy() # Equivalent to schedule[schedule['cirquitId'] == 'americas']. The .loc method is label-based indexing
 
-# Raise a value error if no results were found for the Americas circuit in the target season
+# Raise a value error if no results were found for the Americas circuit in the target season or there are more than one matched result for the race
 if len(austin) != 1:
-    raise ValueError(f"No race found for the Americas circuit for the {target_year} season. Check the race schedule and target_year")
+    raise ValueError(f"No race found for the Americas circuit for the {target_year} season. Check the race schedule and target year variable. Found {len(austin)} races instead of 1.")
 
 target_race = austin.iloc[0] # Get the first row of the matched dataframe (there should only be one row for the Americas circuit in the target season) (the .iloc method is position-based indexing)
 target_date = pd.Timestamp(target_race['raceDate'].tz_localize(None)).normalize() # Convert the race date to a timezone-naive timestamp and normalize it to midnight
