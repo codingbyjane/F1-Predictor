@@ -116,9 +116,16 @@ austin = schedule.loc[schedule['circuitId'].eq('americas')].copy() # Equivalent 
 
 # Raise a value error if no results were found for the Americas circuit in the target season or there are more than one matched result for the race
 if len(austin) != 1:
-    raise ValueError(f"No race found for the Americas circuit for the {target_year} season. Check the race schedule and target year variable. Found {len(austin)} races instead of 1.")
+    raise ValueError(f"No valid race found in the Americas circuit for the {target_year} season. Check the race schedule and target year variable. Found {len(austin)} races instead of 1.")
 
-target_race = austin.iloc[0] # Get the first row of the matched dataframe (there should only be one row for the Americas circuit in the target season) (the .iloc method is position-based indexing)
+target_race = austin.iloc[0] # Get the first row of the matched dataframe (there should only be one row for the Americas circuit in the target season). the .iloc method is position-based indexing
+
+# Target race date inspection
+print(f"Target race date: {target_race['raceDate']}")
+print(f"Type of the target race date: {type(target_race['raceDate'])}")
+print(f"Inspect of the target race date value is a Pandas Timestamp object: {target_race['raceDate'].tz}")
+
+
 target_date = pd.Timestamp(target_race['raceDate'].tz_localize(None)).normalize() # Convert the race date to a timezone-naive timestamp and normalize it to midnight
 
 frames = []
