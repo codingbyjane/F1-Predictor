@@ -125,9 +125,9 @@ print(f"Target race date: {target_race['raceDate']}")
 print(f"Type of the target race date: {type(target_race['raceDate'])}")
 print(f"Inspect of the target race date value is a Pandas Timestamp object: {target_race['raceDate'].tz}")
 
-target_date = pd.Timestamp(target_race['raceDate'].tz_localize(None)).normalize() # Convert the race date to a timezone-naive timestamp and normalize it to midnight
+target_date = pd.Timestamp(target_race['raceDate'].tz_localize(None)).normalize() # assign the target date to a corresponding variable and the race date to a timezone-naive timestamp and normalize it to midnight
 
-# Create an empty list to store the season results dataframes for each year (i.e., collecting previously created results_df dataframes for yeach year from the start year to the target year (inclusive))
+# Create an empty list to store the season results dataframes for each year (i.e., collecting previously created results_df dataframes for each year from the start year to the target year (inclusive))
 season_results_frames = []
 
 for year in range(start_year, target_year + 1): # Iterate through the years from the start year to the target year (+1 means inclusive of the target year)
@@ -137,7 +137,9 @@ for year in range(start_year, target_year + 1): # Iterate through the years from
         season_results_frames.append(partial_results)
     print(f"{year}: {len(partial_results)} driver results loaded")
 
-raw = pd.concat(season_results_frames, ignore_index=True)
+raw = pd.concat(season_results_frames, ignore_index=True) # concatenate all the seasonal results dataframes stored in the list into a single large dataframe of raw results, ignore the original pandas indeces 
 raw['raceDate'] = pd.to_datetime(raw['raceDate'].dt.tz_localize(None))
 
 today = pd.Timestamp(datetime.now(timezone.utc)).date()
+
+history = raw.loc[(raw['raceDate'] < target_date) & (raw['raceDate'] < today)].copy()
