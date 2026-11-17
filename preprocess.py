@@ -144,3 +144,10 @@ today = pd.Timestamp(datetime.now(timezone.utc)).date()
 '''history_df = raw_szn_resluts_df.loc[(raw_szn_resluts_df['raceDate'] < target_date) & (raw_szn_resluts_df['raceDate'] < today)].copy()'''
 
 history_df = raw_szn_resluts_df.loc[(raw_szn_resluts_df['raceDate'] < target_date)].copy() # filter the raw seasonal results dataframe to include only historical data preceding the target race date and store its copy in a corresponding variable
+
+history_df['position'] = pd.to_numeric(history_df['position'], errors='raise')
+history_df['points'] = pd.to_numeric(history_df['points'], errors='raise')
+
+history_df = history_df.sort_values(['raceDate', 'season', 'round', 'position'])
+
+assert not history_df.duplicated(['season', 'round', 'driverId']).any(), "Duplicate driver results found for the same race. Check the data for inconsistencies."
