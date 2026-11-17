@@ -150,4 +150,10 @@ history_df['points'] = pd.to_numeric(history_df['points'], errors='raise')
 
 history_df = history_df.sort_values(['raceDate', 'season', 'round', 'position'])
 
+# Check if there are any duplicated driver results found. Pandas .duplicated() returns a boolean series indicating whether each row is a duplicate of a previous row based on the specified subset of columns. The .any() method checks if any of the values in the boolean series are True, indicating that there are duplicates present. If duplicates are found, an AssertionError is raised.
 assert not history_df.duplicated(['season', 'round', 'driverId']).any(), "Duplicate driver results found for the same race. Check the data for inconsistencies."
+
+# Aggregate the number of entrants and winners for each race in the historical data
+race_checks = history_df.groupby(['season', 'round']).agg(
+    entrants=('driverId', 'size'), winners=('position', lambda x: x.eq(1).sum())
+)
