@@ -136,14 +136,14 @@ for year in range(start_year, target_year + 1): # Iterate through the years from
         season_results_frames.append(partial_results)
     print(f"{year}: {len(partial_results)} driver results loaded")
 
-raw_szn_resluts_df = pd.concat(season_results_frames, ignore_index=True) # concatenate all the seasonal results dataframes stored in the list into a single large dataframe of raw results, ignore the original pandas indeces 
-raw_szn_resluts_df['raceDate'] = pd.to_datetime(raw_szn_resluts_df['raceDate'].dt.tz_localize(None))
+raw_szn_results_df = pd.concat(season_results_frames, ignore_index=True) # concatenate all the seasonal results dataframes stored in the list into a single large dataframe of raw results, ignore the original pandas indeces. By default, pd.concat() stacks DataFrames vertically (axis=0). In other words, it adds rows, not columns.
+raw_szn_results_df['raceDate'] = pd.to_datetime(raw_szn_results_df['raceDate'].dt.tz_localize(None))
 
 today = pd.Timestamp(datetime.now(timezone.utc)).date()
 
-'''history_df = raw_szn_resluts_df.loc[(raw_szn_resluts_df['raceDate'] < target_date) & (raw_szn_resluts_df['raceDate'] < today)].copy()'''
+'''history_df = raw_szn_results_df.loc[(raw_szn_results_df['raceDate'] < target_date) & (raw_szn_results_df['raceDate'] < today)].copy()'''
 
-history_df = raw_szn_resluts_df.loc[(raw_szn_resluts_df['raceDate'] < target_date)].copy() # filter the raw seasonal results dataframe to include only historical data preceding the target race date and store its copy in a corresponding variable
+history_df = raw_szn_results_df.loc[(raw_szn_results_df['raceDate'] < target_date)].copy() # filter the raw seasonal results dataframe to include only historical data preceding the target race date and store its copy in a corresponding variable
 
 history_df['position'] = pd.to_numeric(history_df['position'], errors='raise')
 history_df['points'] = pd.to_numeric(history_df['points'], errors='raise')
@@ -157,3 +157,6 @@ assert not history_df.duplicated(['season', 'round', 'driverId']).any(), "Duplic
 race_checks = history_df.groupby(['season', 'round']).agg(
     entrants=('driverId', 'size'), winners=('position', lambda x: x.eq(1).sum())
 )
+
+# Check if any races have fewer than 18 entrants.
+assert race_checks['entrants'].ge(18).all(), "Incomplete race data. Some races have fewer than 18 entrants. Check the data for inconsistencies."
