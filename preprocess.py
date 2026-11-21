@@ -173,3 +173,5 @@ print(f"Latest historical race before the target date: {history_df['raceDate'].m
 # Access the maximum element in the history_df dataframe through the 'raceDate' label
 latest_race = history_df.loc[history_df['raceDate'].eq(history_df['raceDate'].max())].copy()
 race_preview = latest_race.assign(Driver=latest_race.givenName + " " + latest_race.familyName)
+
+display(race_preview[['Driver', 'constructorName', 'position', 'points']].head(5))
