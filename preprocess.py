@@ -170,6 +170,6 @@ assert history_df['season'].max() == target_year, "No current season data found.
 print(f"\nTarget race: {target_race['raceName']} - {target_date.date()}")
 print(f"Latest historical race before the target date: {history_df['raceDate'].max().date()}")
 
-print(f"Latest histrocial race: {history_df['raceDate'].max().date()}")
-
+# Access the maximum element in the history_df dataframe through the 'raceDate' label
 latest_race = history_df.loc[history_df['raceDate'].eq(history_df['raceDate'].max())].copy()
+race_preview = latest_race.assign(Driver=latest_race.givenName + " " + latest_race.familyName)
