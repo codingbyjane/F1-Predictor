@@ -137,7 +137,10 @@ for year in range(start_year, target_year + 1): # Iterate through the years from
     print(f"{year}: {len(partial_results)} driver results loaded")
 
 raw_szn_results_df = pd.concat(season_results_frames, ignore_index=True) # concatenate all the seasonal results dataframes stored in the list into a single large dataframe of raw results, ignore the original pandas indeces. By default, pd.concat() stacks DataFrames vertically (axis=0). In other words, it adds rows, not columns.
-raw_szn_results_df['raceDate'] = pd.to_datetime(raw_szn_results_df['raceDate'].dt.tz_localize(None))
+
+# Inspect if the 'raceDate' column is a timezone-aware datetime dtype
+print(raw_szn_results_df['raceDate'].dtype)
+raw_szn_results_df['raceDate'] = pd.to_datetime(raw_szn_results_df['raceDate'].dt.tz_localize(None)) # Removing the timezone information from the 'raceDate' column and converting it to timezone-naive datetime values. (.dt gives you access to date/time-specific operations on that Series)
 
 today = pd.Timestamp(datetime.now(timezone.utc)).date()
 
@@ -158,5 +161,6 @@ race_checks = history_df.groupby(['season', 'round']).agg(
     entrants=('driverId', 'size'), winners=('position', lambda x: x.eq(1).sum())
 )
 
-# Check if any races have fewer than 18 entrants.
+# Check if any races have fewer than 18 entrants. The .ge() method checks if each value in the 'entrants' column is greater than or equal to 18, and the .all() method checks if all values in the resulting boolean series are True. If any race has fewer than 18 entrants, an AssertionError is raised.
 assert race_checks['entrants'].ge(18).all(), "Incomplete race data. Some races have fewer than 18 entrants. Check the data for inconsistencies."
+assert race_checks['winners'].eq(1).all(), "Invalid race data. Each race has to have exactly one winner. Check the data for inconsistencies."
