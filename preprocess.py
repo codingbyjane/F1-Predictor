@@ -11,6 +11,8 @@ from datetime import timezone, datetime
 import fastf1
 from fastf1.ergast import Ergast
 
+from IPython.display import display
+
 print('FastF1', fastf1.__version__,)
 
 target_year = 2026 # The year we want to get predictions on
@@ -174,4 +176,11 @@ print(f"Latest historical race before the target date: {history_df['raceDate'].m
 latest_race = history_df.loc[history_df['raceDate'].eq(history_df['raceDate'].max())].copy()
 race_preview = latest_race.assign(Driver=latest_race.givenName + " " + latest_race.familyName)
 
-display(race_preview[['Driver', 'constructorName', 'position', 'points']].head(5))
+display(race_preview[['Driver', 'constructorName', 'position', 'points']].head(5)
+        .rename(columns={
+            'constructorName' : 'Team',
+            'position' : 'Finished',
+            'points' : 'Points'
+        })
+        .reset_index(drop=True)
+        )
