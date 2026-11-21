@@ -146,7 +146,8 @@ today = pd.Timestamp(datetime.now(timezone.utc)).date()
 
 '''history_df = raw_szn_results_df.loc[(raw_szn_results_df['raceDate'] < target_date) & (raw_szn_results_df['raceDate'] < today)].copy()'''
 
-history_df = raw_szn_results_df.loc[(raw_szn_results_df['raceDate'] < target_date)].copy() # filter the raw seasonal results dataframe to include only historical data preceding the target race date and store its copy in a corresponding variable
+history_df = raw_szn_results_df.loc[(raw_szn_results_df['raceDate'] < target_date)].copy() # Filter the raw seasonal results dataframe to include only historical data preceding the target race date and store its copy in a corresponding variable
+
 
 history_df['position'] = pd.to_numeric(history_df['position'], errors='raise')
 history_df['points'] = pd.to_numeric(history_df['points'], errors='raise')
@@ -164,3 +165,11 @@ race_checks = history_df.groupby(['season', 'round']).agg(
 # Check if any races have fewer than 18 entrants. The .ge() method checks if each value in the 'entrants' column is greater than or equal to 18, and the .all() method checks if all values in the resulting boolean series are True. If any race has fewer than 18 entrants, an AssertionError is raised.
 assert race_checks['entrants'].ge(18).all(), "Incomplete race data. Some races have fewer than 18 entrants. Check the data for inconsistencies."
 assert race_checks['winners'].eq(1).all(), "Invalid race data. Each race has to have exactly one winner. Check the data for inconsistencies."
+assert history_df['season'].max() == target_year, "No current season data found. Check data availability for the target year."
+
+print(f"\nTarget race: {target_race['raceName']} - {target_date.date()}")
+print(f"Latest historical race before the target date: {history_df['raceDate'].max().date()}")
+
+print(f"Latest histrocial race: {history_df['raceDate'].max().date()}")
+
+latest_race = history_df.loc[history_df['raceDate'].eq(history_df['raceDate'].max())].copy()
