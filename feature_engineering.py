@@ -1,5 +1,7 @@
 from collections import defaultdict, deque
 
+import numpy as np
+
 # Define the features for the model
 FEATURES = [
     'driver_finish_5',
@@ -13,7 +15,10 @@ FEATURES = [
     'driver_history_count'
 ]
 
-# Define dictionaries to store recent history for drivers, teams, and circuits
+# Define dictionaries to store recent history for drivers, teams, and circuits. defaultdict automatically creates a value for a new key
 drivers = defaultdict(lambda: deque(maxlen=5))
 teams = defaultdict(lambda: deque(maxlen=5))
 circuits = defaultdict(lambda: deque(maxlen=5))
+
+def average(records, column):
+    return float(np.mean([row[column] for row in records])) if records else np.nan
